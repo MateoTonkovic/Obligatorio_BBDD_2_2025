@@ -11,6 +11,8 @@ services:
       - "3001:3001" 
     environment:
       - NODE_ENV=development
+    env_file:
+      - ./backend/.env
   frontend:
     build:
       context: ./frontend
