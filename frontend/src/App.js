@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import EmisionVoto from "./Views/EmisionVoto/EmisionVoto";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./Views/Login/Login";
 
 function App() {
 //   const [backendMsg, setBackendMsg] = useState("Cargando…");
@@ -26,6 +26,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/votar" element={<EmisionVoto />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
     </div>

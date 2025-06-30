@@ -1,0 +1,108 @@
+body,
+html,
+#root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.contenedor-login {
+    font-family: "Segoe UI", sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #eceaea;
+}
+
+.encabezado {
+    background-color: #25418e;
+    color: #ffffff;
+    padding: 1.2rem 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.logo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    height: 5.5rem;
+}
+
+.estado {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.cuerpo {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.login-form {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.login-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    color: #1e2a38;
+    font-weight: 500;
+}
+
+.login-form input {
+    margin-top: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    outline-color: #007bff;
+    transition: 0.2s ease;
+}
+
+.login-form input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.boton-confirmar {
+    background-color: #25418e;
+    color: #ffffff;
+    padding: 0.9rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.boton-confirmar:hover {
+    background-color: #020b1f;
+}
+
+.mensaje {
+    color: #e6194b;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.label {
+    text-align: start;
+}
