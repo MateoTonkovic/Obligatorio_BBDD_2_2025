@@ -11,7 +11,7 @@ async function authenticate(ci, contrasena, circuito) {
     if (!person) throw new Error('Usuario no encontrado');
 
     const [[votante]] = await conn.query(
-      'SELECT Contrasena FROM Votante WHERE CIPersona = ? AND NumeroCircuito = ?',
+      'SELECT Contrasena FROM Votante WHERE CIPersona = ? AND NumeroCircuito = ? AND Voto = FALSE',
       [ci, circuito]
     );
     const [[miembro]] = await conn.query(
