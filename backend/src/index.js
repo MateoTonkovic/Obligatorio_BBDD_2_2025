@@ -11,11 +11,13 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRouter);
+
+app.use('/api', authMiddleware);
 
 app.use('/api/listas', listasRouter);
 app.use('/api/votos', votosRouter);
 app.use('/api/seeder', seederRouter);
-app.use('/api/auth', authRouter);
 
 app.get('/', (req, res) => {
     res.send({ message: 'mensaje de backend' });
