@@ -1,31 +1,27 @@
 const pool = require('../db');
 
 async function authMiddleware(req, res, next) {
-  const sessionId = req.headers['session'] || req.headers['authorization'];
-  if (!sessionId) {
+  const tokenId = req.headers['token'] || req.headers['authorization'];
+  if (!tokenId) {
     return res.status(401).json({ error: 'No session' });
   }
 
   const conn = await pool.getConnection();
   try {
-    const [[session]] = await conn.query(
-      'SELECT SessionId, FechaExpiracion, Utilizado FROM Session WHERE SessionId = ?',
-      [sessionId]
+    const [[token]] = await conn.query(
+      'SELECT IDToken, fechaExpiracion FROM Token WHERE IDToken = ?',
+      [tokenId]
     );
-    if (!session) {
+    if (!token) {
       return res.status(401).json({ error: 'Invalid session' });
     }
 
     const now = new Date();
-    if (session.FechaExpiracion < now) {
+    if (token.fechaExpiracion < now) {
       return res.status(401).json({ error: 'invalid session' });
     }
 
-    if (session.Utilizado) {
-      return res.status(401).json({ error: 'invalid session' });
-    }
-
-    req.sessionId = sessionId;
+    req.token = tokenId;
     next();
   } catch (err) {
     console.error('Auth middleware error', err);

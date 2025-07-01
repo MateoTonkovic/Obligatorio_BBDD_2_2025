@@ -4,6 +4,7 @@ const seederRouter = require('./seeder');
 const listasRouter = require("./routes/listas");
 const votosRouter = require("./routes/votos");
 const authRouter = require("./routes/auth.routes");
+const authMiddleware = require("./middleware/auth.middleware");
 
 const app = express();
 const PORT = process.env.PORT || 3001;

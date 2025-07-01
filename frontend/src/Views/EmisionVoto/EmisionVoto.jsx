@@ -9,7 +9,13 @@ function EmisionVoto() {
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/listas")
+    fetch("http://localhost:3001/api/listas", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token: `${localStorage.getItem("tokenId")}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Respuesta no OK del servidor");
