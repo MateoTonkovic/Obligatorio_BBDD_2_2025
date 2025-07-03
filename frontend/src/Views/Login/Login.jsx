@@ -12,7 +12,7 @@ export default function LoginScreen() {
     const [mensaje, setMensaje] = useState('');
 
     const onLogin = (data) => {
-        const { sessionId, tokenId, role, observado } = data;
+        const { sessionId, tokenId, role, observado, debeElegir } = data;
 
         if (observado) {
             alert('El voto será observado');
@@ -22,7 +22,13 @@ export default function LoginScreen() {
         localStorage.setItem('tokenId', tokenId);
         localStorage.setItem('userRole', role);
 
-        navigate('/votar')
+        if (role === 'miembro' && debeElegir) {
+            navigate('/mesa/decidir');
+        } else if (role === 'miembro') {
+            navigate('/mesa');
+        } else {
+            navigate('/votar');
+        }
     };
 
     const handleSubmit = async () => {
