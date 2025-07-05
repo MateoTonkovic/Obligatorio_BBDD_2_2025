@@ -7,13 +7,19 @@ function EmisionVoto() {
   const [seleccionada, setSeleccionada] = useState(null);
   const [mensaje, setMensaje] = useState("");
   const [busqueda, setBusqueda] = useState("");
+  const [votoExitoso, setVotoExitoso] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("tokenId");
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
+
     fetch("http://localhost:3001/api/listas", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        token: `${localStorage.getItem("tokenId")}`,
+        token: token,
       },
     })
       .then((res) => {
@@ -26,17 +32,52 @@ function EmisionVoto() {
         setListas(data.flat());
       })
       .catch((error) => {
-        console.error("❌ Error al cargar las listas:", error);
-        setMensaje("⚠️ Error al cargar las listas");
+        console.error("Error al cargar las listas:", error);
+        setMensaje("Error al cargar las listas");
       });
   }, []);
 
   const confirmarVoto = () => {
     if (!seleccionada) {
-      setMensaje("Por favor seleccioná una lista");
-    } else {
-      setMensaje(`Voto registrado para la lista ${seleccionada}`);
+      setMensaje("Por favor seleccioná una lista.");
+      return;
     }
+
+    fetch("http://localhost:3001/api/votos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("tokenId"),
+      },
+      body: JSON.stringify({
+        sessionId: localStorage.getItem("sessionId"),
+        numeroLista: seleccionada,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setVotoExitoso(true);
+          setMensaje("¡Voto registrado con éxito!");
+        } else {
+          setMensaje(`Error: ${data.error || "No se pudo registrar el voto"}`);
+        }
+      })
+      .catch((err) => {
+        console.error("Error al emitir voto:", err);
+        setMensaje("Ocurrió un error al emitir el voto.");
+      });
+  };
+
+  const cerrarSesion = () => {
+    localStorage.removeItem("tokenId");
+    localStorage.removeItem("sessionId");
+    localStorage.removeItem("userRole");
+    navigate("/login");
+  };
+
+  const volverTareasMesa = () => {
+    navigate("/miembroMesa");
   };
 
   const listasFiltradas = listas.filter((lista) => {
@@ -58,50 +99,93 @@ function EmisionVoto() {
       </header>
 
       <main className="cuerpo">
-        <h2 className="titulo-seleccion">Seleccioná una lista:</h2>
-
-        <input
-          type="text"
-          placeholder="Buscar por número de lista o partido..."
-          className="buscador"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-
-        <div className="opciones-listas-grid">
-          {listasFiltradas.map((lista, i) => (
-            <label
-              key={i}
-              className={`opcion-lista color-partido-${lista.IdPartido} ${
-                seleccionada === lista.NumeroLista ? "seleccionada" : ""
-              }`}
-            >
+        {!votoExitoso && (
+          <>
+            <div className="seccion-busqueda">
+              <h2 className="titulo-seleccion">Seleccioná una lista:</h2>
               <input
-                type="radio"
-                name="lista"
-                value={lista.NumeroLista}
-                onChange={() => setSeleccionada(lista.NumeroLista)}
+                type="text"
+                className="buscador"
+                placeholder="Buscar por número de lista o partido..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
               />
-              <div>
-                <strong>Lista {lista.NumeroLista}</strong>
-                <br />
-                Partido {lista.IdPartido}
-              </div>
-            </label>
-          ))}
-        </div>
+            </div>
+
+            <div className="opciones-listas-grid">
+              <label
+                className={`opcion-lista especial blanco ${
+                  seleccionada === "blanco" ? "seleccionada" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="lista"
+                  value="blanco"
+                  onChange={() => setSeleccionada("blanco")}
+                />
+                <div>
+                  <strong>Voto en Blanco</strong>
+                </div>
+              </label>
+              <label
+                className={`opcion-lista especial anulado ${
+                  seleccionada === "anulado" ? "seleccionada" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="lista"
+                  value="anulado"
+                  onChange={() => setSeleccionada("anulado")}
+                />
+                <div>
+                  <strong>Voto Anulado</strong>
+                </div>
+              </label>
+              {listasFiltradas.map((lista, i) => (
+                <label
+                  key={i}
+                  className={`opcion-lista color-partido-${lista.IdPartido} ${
+                    seleccionada === lista.NumeroLista ? "seleccionada" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="lista"
+                    value={lista.NumeroLista}
+                    onChange={() => setSeleccionada(lista.NumeroLista)}
+                  />
+                  <div>
+                    <strong>Lista {lista.NumeroLista}</strong>
+                    <br />
+                    Partido {lista.IdPartido}
+                  </div>
+                </label>
+              ))}
+            </div>
+          </>
+        )}
 
         {mensaje && <p className="mensaje">{mensaje}</p>}
       </main>
 
       <footer className="pie">
-        <button className="boton-confirmar" onClick={confirmarVoto}>
-          Confirmar
-        </button>
+        {!votoExitoso ? (
+          <button className="boton-confirmar" onClick={confirmarVoto}>
+            Confirmar
+          </button>
+        ) : (
+          <div className="acciones-post-voto">
+            {userRole === "miembro" ? (
+              <button onClick={volverTareasMesa}>Volver a mesa</button>
+            ) : null}
+            <button onClick={cerrarSesion}>Cerrar sesión</button>
+          </div>
+        )}
       </footer>
     </div>
   );
 }
 
 export default EmisionVoto;
-

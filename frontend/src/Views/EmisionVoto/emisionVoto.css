@@ -38,60 +38,37 @@ html,
   color: #ffffff;
 }
 
-.elecciones {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #25418e;
-  margin-left: 1rem;
-  background-color: #bbbaba;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  text-align: center;
-}
-
 .cuerpo {
   background-color: #eceaea;
   flex-grow: 1;
   padding: 2rem;
-  text-align: center;
-  padding-bottom: 5%;
+  padding-bottom: 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .titulo-seleccion {
-  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
   color: #1e2a38;
+  margin-bottom: 2%;
   text-align: center;
-  margin-bottom: 1rem;
-  letter-spacing: 0.5px;
 }
 
-.buscador {
-  margin-top: 1rem;
-  padding: 0.8rem 1rem;
-  width: 80%;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  outline-color: #007bff;
-  transition: 0.2s ease;
-  margin-bottom: 2%;
+.seccion-busqueda {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
+
 
 .buscador:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-}
-
-/* Grilla de listas */
-.opciones-listas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(22%, 1fr));
-  gap: 1.5rem;
-  width: 90%;
-  margin: 0 auto;
-  justify-content: center;
 }
 
 .opcion-lista {
@@ -108,21 +85,6 @@ html,
   cursor: pointer;
   font-size: 1.1rem;
   color: #333;
-}
-
-.opcion-lista:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-.opcion-lista.seleccionada {
-  border: 2px solid #494c50;
-  background: #e6f0ff;
-}
-
-.opcion-lista input[type="radio"] {
-  margin-bottom: 0.6rem;
-  transform: scale(1.3);
 }
 
 .pie {
@@ -165,21 +127,6 @@ html,
   text-align: center;
 }
 
-.info-lista {
-  display: flex;
-  flex-direction: column;
-}
-
-.numero-lista {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.partido {
-  font-size: 0.9rem;
-  color: #555;
-}
-
 .color-partido-1  { border-left: 0.7rem solid #e6194b; }
 .color-partido-3  { border-left: 0.7rem solid #3cb44b; }
 .color-partido-5  { border-left: 0.7rem solid #4363d8; }
@@ -191,4 +138,47 @@ html,
 .color-partido-17 { border-left: 0.7rem solid #fabebe; }
 .color-partido-19 { border-left: 0.7rem solid #008080; }
 .color-partido-21 { border-left: 0.7rem solid #ffd700; }
+
+.buscador {
+  width: 100%;
+  max-width: 850px;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+  outline-color: #007bff;
+  box-sizing: border-box;
+  margin: 0 auto 2rem auto;
+  display: block;
+  margin-bottom: 3%;
+}
+
+.opciones-listas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 1600px;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+.opcion-lista.blanco {
+  background-color: #f0f0f0;
+  border-left: 0.7rem solid #8c8c8c;
+  color: #222;
+}
+
+.opcion-lista.anulado {
+  background-color: #e8e8e8;
+  border-left: 0.7rem solid #5a5a5a;
+  color: #222;
+}
+
+.opcion-lista.seleccionada {
+  background: #a3a3a3;
+  border-color: #000000;
+}
+
+
 
