@@ -21,9 +21,6 @@ app.use('/api', authMiddleware);
 app.use('/api/listas', listasRouter);
 app.use('/api/votos', votosRouter);
 app.use('/api/votos/autorizar', authVoto);
-app.get('/', (req, res) => {
-    res.send({ message: 'mensaje de backend' });
-});
 
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
