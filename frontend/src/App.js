@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Views/Login/Login';
 import EmisionVoto from './Views/EmisionVoto/EmisionVoto';
+import PantallaDecision from './Views/PantallaDecision/PantallaDecision';
 import PrivateRoute from './middlewares/PrivateRoute';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Route element={<PrivateRoute />}>  
             {/* Acá adentro van las rutas protegidas */}
             <Route path="/votar" element={<EmisionVoto />} />
+            <Route path="/mesa/decidir" element={<PantallaDecision />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />
