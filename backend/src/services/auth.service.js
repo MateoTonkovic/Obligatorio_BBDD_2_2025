@@ -19,9 +19,15 @@ async function authenticate(ci, contrasena, circuito) {
       [ci, circuito]
     );
 
-    let role = null;
-    let observado = false;
+    const [[circuitoInfo]] = await conn.query(
+      'SELECT NumeroCircuito FROM Circuito WHERE NumeroCircuito = ?',
+      [circuito]
+    );
+
+    if (!circuitoInfo) throw new Error('Circuito no encontrado');
+    const observado = person.CredencialCivica < circuitoInfo.PrimeraCredencial || person.CredencialCivica > circuitoInfo.UltimaCredencial;
     let debeElegir = false;
+    let role = null;
 
     if (miembro) {
       if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
@@ -34,8 +40,6 @@ async function authenticate(ci, contrasena, circuito) {
         'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
         [ci, circuito]
       );
-    } else {
-      observado = true;
     }
 
     const sessionId = crypto.randomUUID();
