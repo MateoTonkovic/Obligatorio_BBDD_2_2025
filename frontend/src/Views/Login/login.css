@@ -81,7 +81,7 @@ html,
 }
 
 .boton-confirmar {
-    background-color: #25418e;
+    background-color: red;
     color: #ffffff;
     padding: 0.9rem 2rem;
     border: none;
