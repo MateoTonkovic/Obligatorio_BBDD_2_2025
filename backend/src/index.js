@@ -4,6 +4,7 @@ const seederRouter = require('./seeder');
 const listasRouter = require("./routes/listas");
 const votosRouter = require("./routes/votos");
 const authRouter = require("./routes/auth.routes");
+const authVoto = require("./routes/authVoto");
 const authMiddleware = require("./middleware/auth.middleware");
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api', authMiddleware);
 app.use('/api/listas', listasRouter);
 app.use('/api/votos', votosRouter);
 app.use('/api/seeder', seederRouter);
+app.use('/api/votos/autorizar', authVoto);
 
 app.get('/', (req, res) => {
     res.send({ message: 'mensaje de backend' });

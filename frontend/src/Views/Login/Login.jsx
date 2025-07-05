@@ -25,7 +25,7 @@ export default function LoginScreen() {
         if (role === 'miembro' && debeElegir) {
             navigate('/mesa/decidir');
         } else if (role === 'miembro') {
-            navigate('/mesa');
+            navigate('/mesa/autorizar');
         } else {
             navigate('/votar');
         }
