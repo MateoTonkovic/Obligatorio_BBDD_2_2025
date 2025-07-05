@@ -21,6 +21,7 @@ export default function LoginScreen() {
         localStorage.setItem('sessionId', sessionId);
         localStorage.setItem('tokenId', tokenId);
         localStorage.setItem('userRole', role);
+        localStorage.setItem('observado', observado);
 
         navigate('/votar')
     };
