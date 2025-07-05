@@ -4,6 +4,12 @@ const crypto = require('crypto');
 async function authenticate(ci, contrasena, circuito) {
   const conn = await pool.getConnection();
   try {
+    const [[person]] = await conn.query(
+      'SELECT CI FROM Persona WHERE CI = ?',
+      [ci]
+    );
+    if (!person) throw new Error('Usuario no encontrado');
+
     const [[votante]] = await conn.query(
       'SELECT NumeroCircuito, Contrasena FROM Votante WHERE CIPersona = ? AND Voto = FALSE',
       [ci]
@@ -14,10 +20,16 @@ async function authenticate(ci, contrasena, circuito) {
       [ci, circuito]
     );
 
-    let role = null;
-    let observado = false;
-    let debeElegir = false;
+    const [[circuitoInfo]] = await conn.query(
+      'SELECT NumeroCircuito FROM Circuito WHERE NumeroCircuito = ?',
+      [circuito]
+    );
 
+    if (!circuitoInfo) throw new Error('Circuito no encontrado');
+    const observado = person.CredencialCivica < circuitoInfo.PrimeraCredencial || person.CredencialCivica > circuitoInfo.UltimaCredencial;
+    let debeElegir = false;
+    let role = null;
+    
     if (miembro) {
       if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
       role = 'miembro';

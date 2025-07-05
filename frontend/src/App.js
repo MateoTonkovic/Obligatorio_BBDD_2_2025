@@ -13,12 +13,11 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route element={<PrivateRoute />}>  
-            {/* Acá adentro van las rutas protegidas */}
             <Route path="/votar" element={<EmisionVoto />} />
             <Route path="/mesa">
               <Route path="decidir" element={<PantallaDecision />} />
               <Route path="autorizar" element={<AutorizarVoto />} />
-              <Route index element={<AutorizarVoto />} /> {/* Ruta /mesa */}
+              <Route index element={<AutorizarVoto />} />
             </Route>
           </Route>
 
