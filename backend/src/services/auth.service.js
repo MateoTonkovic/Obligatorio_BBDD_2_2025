@@ -19,8 +19,15 @@ async function authenticate(ci, contrasena, circuito) {
       [ci, circuito]
     );
 
+    const [[circuito]] = await conn.query(
+      'SELECT NumeroCircuito FROM Circuito WHERE NumeroCircuito = ?',
+      [circuito]
+    );
+
+    if (!circuito) throw new Error('Circuito no encontrado');
+    const observado = person.CredencialCivica < circuito.PrimeraCredencial || person.CredencialCivica > circuito.UltimaCredencial;
+
     let role = null;
-    let observado = false;
 
     if (votante) {
       if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
