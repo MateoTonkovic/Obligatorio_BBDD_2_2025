@@ -181,5 +181,35 @@ html,
   border-color: #000000;
 }
 
+.mensaje-exito {
+  background-color: #e6e9f9;
+  border: 2px solid #285ba7;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  margin: 40px auto;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
+.mensaje-exito h2 {
+  color: #232188;
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+}
 
+.mensaje-exito p {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.mensaje-exito p.observado {
+  color: #020202;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.acciones-post-voto {
+  margin-top: 24px;
+}

@@ -1,60 +1,71 @@
-const pool = require('../db');
-const crypto = require('crypto');
+const pool = require("../db");
+const crypto = require("crypto");
 
 async function authenticate(ci, contrasena, circuito) {
   const conn = await pool.getConnection();
   try {
-    const [[person]] = await conn.query(
-      'SELECT CI FROM Persona WHERE CI = ?',
-      [ci]
-    );
-    if (!person) throw new Error('Usuario no encontrado');
+    const [[person]] = await conn.query("SELECT * FROM Persona WHERE CI = ?", [
+      ci,
+    ]);
+    if (!person) throw new Error("Usuario no encontrado");
 
     const [[votante]] = await conn.query(
-      'SELECT Contrasena FROM Votante WHERE CIPersona = ? AND NumeroCircuito = ? AND Voto = FALSE',
+      "SELECT Contrasena FROM Votante WHERE CIPersona = ? AND NumeroCircuito = ? AND Voto = FALSE",
       [ci, circuito]
     );
     const [[miembro]] = await conn.query(
-      'SELECT Contrasena FROM MiembroMesa WHERE CIPersona = ? AND IdMesa = ?',
+      "SELECT Contrasena FROM MiembroMesa WHERE CIPersona = ? AND IdMesa = ?",
       [ci, circuito]
     );
 
     const [[circuitoInfo]] = await conn.query(
-      'SELECT NumeroCircuito FROM Circuito WHERE NumeroCircuito = ?',
+      "SELECT * FROM Circuito WHERE NumeroCircuito = ?",
       [circuito]
     );
 
-    if (!circuitoInfo) throw new Error('Circuito no encontrado');
-    const observado = person.CredencialCivica < circuitoInfo.PrimeraCredencial || person.CredencialCivica > circuitoInfo.UltimaCredencial;
+    console.log("Circuito Info:", circuitoInfo);
+    if (!circuitoInfo) throw new Error("Circuito no encontrado");
+    const observado =
+      person.CredencialCivica < circuitoInfo.PrimeraCredencial ||
+      person.CredencialCivica > circuitoInfo.UltimaCredencial;
+    console.log("Observado:", observado);
     let debeElegir = false;
     let role = null;
 
     if (miembro) {
-      if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
-      role = 'miembro';
+      if (miembro.Contrasena !== contrasena)
+        throw new Error("Credencial inválida");
+      role = "miembro";
       debeElegir = !!votante;
     } else if (votante) {
-      if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
-      role = 'votante';
+      if (votante.Contrasena !== contrasena)
+        throw new Error("Credencial inválida");
+      role = "votante";
       await conn.query(
-        'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
+        "UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?",
         [ci, circuito]
       );
     }
 
     const sessionId = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 3600 * 1000);
+    const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
     await conn.query(
-      'INSERT INTO Session (SessionId, FechaExpiracion, Utilizado) VALUES (?, ?, ?)',
+      "INSERT INTO Session (SessionId, FechaExpiracion, Utilizado) VALUES (?, ?, ?)",
       [sessionId, expiresAt, false]
     );
 
     const [tokenResult] = await conn.query(
-      'INSERT INTO Token (CIPersona, fechaExpiracion) VALUES (?, ?)',
+      "INSERT INTO Token (CIPersona, fechaExpiracion) VALUES (?, ?)",
       [ci, expiresAt]
     );
 
-    return { sessionId, tokenId: tokenResult.insertId, role, observado, debeElegir };
+    return {
+      sessionId,
+      tokenId: tokenResult.insertId,
+      role,
+      observado,
+      debeElegir,
+    };
   } finally {
     conn.release();
   }

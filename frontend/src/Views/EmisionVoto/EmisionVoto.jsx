@@ -19,6 +19,7 @@ function EmisionVoto() {
     const role = localStorage.getItem("userRole");
     const esObservado = localStorage.getItem("observado") === "true";
 
+
     setUserRole(role);
     setObservado(esObservado);
 
@@ -53,6 +54,7 @@ function EmisionVoto() {
       sessionId: localStorage.getItem("sessionId"),
       numeroLista: seleccionada,
       esObservado: observado,
+      numeroCircuito: parseInt(localStorage.getItem("numeroCircuito"), 10)
     });
     fetch("http://localhost:3001/api/votos/emitir", {
       method: "POST",
@@ -64,6 +66,7 @@ function EmisionVoto() {
         sessionId: localStorage.getItem("sessionId"),
         numeroLista: seleccionada,
         esObservado: observado,
+        numeroCircuito: localStorage.getItem("numeroCircuito")
       }),
     })
       .then((res) => res.json())
