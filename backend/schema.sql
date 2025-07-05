@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS Voto (
 	NumeroCircuito INT NOT NULL,
 	Tipo VARCHAR(50),
 	EsObservado BOOLEAN,
+	Autorizado BOOLEAN DEFAULT FALSE,
 	FOREIGN KEY (SessionId) REFERENCES Session (SessionId),
 	FOREIGN KEY (NumeroLista) REFERENCES Lista (NumeroLista),
 	FOREIGN KEY (IdEleccion) REFERENCES Eleccion (IdEleccion),
