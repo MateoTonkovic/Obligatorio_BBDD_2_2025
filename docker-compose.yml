@@ -12,27 +12,11 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=development
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=obligatorio_db
-      - DB_USER=obligatorio_user
-      - DB_PASSWORD=obligatorio_pass
-    depends_on:
-      - mysql
-
-  mysql:
-    image: mysql:8.0
-    container_name: obligatorio-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: obligatorio_db
-      MYSQL_USER: obligatorio_user
-      MYSQL_PASSWORD: obligatorio_pass
-    ports:
-      - "3308:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
+      - DB_HOST=mysql.reto-ucu.net
+      - DB_PORT=50006
+      - DB_NAME=AM_Grupo2
+      - DB_USER=am_g2_admin
+      - DB_PASSWORD=8AS3S_Grup0_2
 
   frontend:
     build:
@@ -49,6 +33,3 @@ services:
       - HOST=0.0.0.0
     stdin_open: true
     tty: true
-
-volumes:
-  mysql_data:
