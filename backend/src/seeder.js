@@ -19,16 +19,13 @@ function parseCSV(fileName) {
 
 router.post('/seed', async (req, res) => {
   const conn = await pool.getConnection();
-  console.log('Starting bulk-seed process...');
 
   try {
-    // Disable checks for faster bulk inserts
     await conn.query('SET FOREIGN_KEY_CHECKS=0');
 
     const rawCircuital = await parseCSV('plan-circuital.csv');
     const rawIntegration = await parseCSV('integracion-de-hojas-de-votacion-eleccion-nacional.csv');
 
-    console.log('CSV files parsed successfully');
     const circuital = rawCircuital.map(rec => ({
       Departamento: rec.Departamento.trim(),
       Localidad: rec.Localidad.trim(),
@@ -38,7 +35,6 @@ router.post('/seed', async (req, res) => {
       Desde: parseInt(rec.Desde, 10) || 0,
       Hasta: parseInt(rec.Hasta, 10) || 0
     }));
-    console.log('Circuital data processed successfully');
 
     const integration = rawIntegration.map(rec => {
       const parts = rec.Nombre.split(',').map(s => s.trim());
@@ -56,11 +52,8 @@ router.post('/seed', async (req, res) => {
       };
     });
 
-    console.log('Integration data processed successfully');
     await conn.beginTransaction();
 
-    console.log('Inserting data into database...');
-    // 1) Departamentos
     const deptNames = Array.from(new Set([
       ...circuital.map(r => r.Departamento),
       ...integration.map(r => r.Departamento)
@@ -72,8 +65,6 @@ router.post('/seed', async (req, res) => {
     );
     const deptMap = new Map(deptNames.map((n, i) => [n, i + 1]));
 
-    console.log('Departamentos inserted successfully');
-    // 2) Localidades
     const locKeys = Array.from(new Set(
       circuital.map(r => `${r.Localidad}|${deptMap.get(r.Departamento)}`)
     ));
@@ -87,16 +78,14 @@ router.post('/seed', async (req, res) => {
       [locValues]
     );
     const locMap = new Map(locKeys.map((k, i) => [k, i + 1]));
-    console.log('Localidades inserted successfully');
-    // 3) Zonas
+
     const zoneValues = Array.from(locMap.values()).map((locId, idx) => [idx + 1, `Zona ${locId}`, locId]);
     await conn.query(
       'INSERT IGNORE INTO Zona (IdZona, Nombre, IdLocalidad) VALUES ?',
       [zoneValues]
     );
     const zoneMap = new Map(zoneValues.map(([, , locId], i) => [locId, i + 1]));
-    console.log('Zonas inserted successfully');
-    // 4) Establecimientos
+
     const estKeys = Array.from(new Set(circuital.map(r => r.Local)));
     const estValues = estKeys.map((name, idx) => {
       const rec = circuital.find(r => r.Local === name);
@@ -111,8 +100,6 @@ router.post('/seed', async (req, res) => {
     );
     const estMap = new Map(estKeys.map((n, i) => [n, i + 1]));
 
-    console.log('Establecimientos inserted successfully');
-    // 5) Comisarías
     const comisValues = deptNames.map((name, idx) => {
       const num = (idx + 1) * 10;
       return [num, `Comisaria de ${name}`, idx + 1];
@@ -122,9 +109,7 @@ router.post('/seed', async (req, res) => {
       [comisValues]
     );
     const comisMap = new Map(deptNames.map((n, i) => [i + 1, (i + 1) * 10]));
-    console.log('Comisarías inserted successfully');
 
-    // 6) Circuitos y Mesas
     const circuitoValues = circuital.map(r => [
       r.NroCircuito,
       estMap.get(r.Local),
@@ -142,9 +127,7 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Mesa (IdMesa, NumeroCircuito, Estado) VALUES ?',
       [mesaValues]
     );
-    console.log('Circuitos and Mesas inserted successfully');
 
-    // 7) Partidos y Listas
     const partyNames = Array.from(new Set(integration.map(r => r.PartidoPolitico)));
     const partyValues = partyNames.map((p, idx) => [idx + 1, p, `${p} 123 Calle Falsa`]);
     await conn.query(
@@ -152,7 +135,6 @@ router.post('/seed', async (req, res) => {
       [partyValues]
     );
     const partyMap = new Map(partyNames.map((p, i) => [p, i + 1]));
-    console.log('Partidos inserted successfully');
 
     const listKeys = Array.from(new Set(
       integration.map(r => `${r.PartidoPolitico}|${r.Departamento}`)
@@ -166,16 +148,12 @@ router.post('/seed', async (req, res) => {
       [listValues]
     );
     const listMap = new Map(listKeys.map((k, i) => [k, i + 1]));
-    console.log('Listas inserted successfully');
 
-    // 8) Elección
     await conn.query(
       'INSERT IGNORE INTO Eleccion (IdEleccion, Tipo, Fecha) VALUES (?, ?, ?)',
       [1, 'Nacional', new Date()]
     );
-    console.log('Elección inserted successfully');
 
-    // 9) Candidatos e Integración
     const personaValues = integration.map(r => [
       r.CredencialNumero,
       r.CredencialNumero,
@@ -187,7 +165,7 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Persona (CI, CredencialCivica, Nombre, Apellido, FechaNacimiento) VALUES ?',
       [personaValues]
     );
-    console.log('Personas inserted successfully');
+
     const candidatoValues = integration.map(r => [
       r.CredencialNumero,
       1,
@@ -197,7 +175,6 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Candidato (CIPersona, IdEleccion, IdPartido) VALUES ?',
       [candidatoValues]
     );
-    console.log('Candidatos inserted successfully');
 
     const integraValues = integration.map(r => {
       const org = r.Candidatura.includes('Diputado')
@@ -216,9 +193,7 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Integra (CIPersona, NumeroLista, OrdenLista, Organo) VALUES ?',
       [integraValues]
     );
-    console.log('Integración inserted successfully');
 
-    // 10) Votantes, MiembrosMesa, AgentesPoliciales
     const votanteValues = circuital.map(r => [
       r.Desde,
       r.NroCircuito,
@@ -229,7 +204,6 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Votante (CIPersona, NumeroCircuito, Contrasena, Voto) VALUES ?',
       [votanteValues]
     );
-    console.log('Votantes inserted successfully');
 
     const miembroValues = circuital.map(r => [
       r.Desde + 100000,
@@ -242,7 +216,6 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO MiembroMesa (CIPersona, IdMesa, OrganismoEstado, Rol, Contrasena) VALUES ?',
       [miembroValues]
     );
-    console.log('MiembrosMesa inserted successfully');
 
     const agentePersonaValues = circuital.map(r => [
       r.Desde + 200000,
@@ -255,7 +228,6 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Persona (CI, CredencialCivica, Nombre, Apellido, FechaNacimiento) VALUES ?',
       [agentePersonaValues]
     );
-    console.log('Agente Personas inserted successfully');
 
     const agenteValues = circuital.map(r => [
       r.Desde + 200000,
@@ -266,10 +238,8 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO AgentePolicial (CIPersona, NumeroComisaria, IdEstablecimiento) VALUES ?',
       [agenteValues]
     );
-    console.log('AgentesPoliciales inserted successfully');
 
     await conn.commit();
-    // Re-enable checks
     await conn.query('SET FOREIGN_KEY_CHECKS=1');
 
     res.json({ status: 'OK', message: 'Bulk-seed completed' });
