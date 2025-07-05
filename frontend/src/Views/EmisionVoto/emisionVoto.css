@@ -127,17 +127,18 @@ html,
   text-align: center;
 }
 
-.color-partido-1  { border-left: 0.7rem solid #e6194b; }
-.color-partido-3  { border-left: 0.7rem solid #3cb44b; }
-.color-partido-5  { border-left: 0.7rem solid #4363d8; }
-.color-partido-7  { border-left: 0.7rem solid #f58231; }
-.color-partido-9  { border-left: 0.7rem solid #911eb4; }
-.color-partido-11 { border-left: 0.7rem solid #46f0f0; }
-.color-partido-13 { border-left: 0.7rem solid #f032e6; }
-.color-partido-15 { border-left: 0.7rem solid #bcf60c; }
-.color-partido-17 { border-left: 0.7rem solid #fabebe; }
-.color-partido-19 { border-left: 0.7rem solid #008080; }
-.color-partido-21 { border-left: 0.7rem solid #ffd700; }
+.color-ap { border-left: 0.7rem solid #e6194b; }
+.color-ca { border-left: 0.7rem solid #3cb44b; }
+.color-fa { border-left: 0.7rem solid #4363d8; }
+.color-ar { border-left: 0.7rem solid #f58231; }
+.color-pc { border-left: 0.7rem solid #911eb4; }
+.color-amb { border-left: 0.7rem solid #46f0f0; }
+.color-eco { border-left: 0.7rem solid #f032e6; }
+.color-ids { border-left: 0.7rem solid #bcf60c; }
+.color-pi { border-left: 0.7rem solid #fabebe; }
+.color-pn { border-left: 0.7rem solid #008080; }
+.color-pcn { border-left: 0.7rem solid #ffd700; }
+.color-generico { border-left: 0.7rem solid #999999; }
 
 .buscador {
   width: 100%;

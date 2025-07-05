@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./emisionVoto.css";
 import escudo from "../../Images/escudoUruguay.png";
+import { useNavigate } from "react-router-dom";
 
 function EmisionVoto() {
   const [listas, setListas] = useState([]);
@@ -9,11 +10,17 @@ function EmisionVoto() {
   const [busqueda, setBusqueda] = useState("");
   const [votoExitoso, setVotoExitoso] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [tipoVoto, setTipoVoto] = useState("");
+  const [observado, setObservado] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("tokenId");
     const role = localStorage.getItem("userRole");
+    const esObservado = localStorage.getItem("observado") === "true";
+
     setUserRole(role);
+    setObservado(esObservado);
 
     fetch("http://localhost:3001/api/listas", {
       method: "GET",
@@ -42,8 +49,12 @@ function EmisionVoto() {
       setMensaje("Por favor seleccioná una lista.");
       return;
     }
-
-    fetch("http://localhost:3001/api/votos", {
+    console.log({
+      sessionId: localStorage.getItem("sessionId"),
+      numeroLista: seleccionada,
+      esObservado: observado,
+    });
+    fetch("http://localhost:3001/api/votos/emitir", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,13 +63,21 @@ function EmisionVoto() {
       body: JSON.stringify({
         sessionId: localStorage.getItem("sessionId"),
         numeroLista: seleccionada,
+        esObservado: observado,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setVotoExitoso(true);
-          setMensaje("¡Voto registrado con éxito!");
+
+          if (seleccionada === "blanco") {
+            setTipoVoto("Voto en Blanco");
+          } else if (seleccionada === "anulado") {
+            setTipoVoto("Voto Anulado");
+          } else {
+            setTipoVoto(`Lista ${seleccionada}`);
+          }
         } else {
           setMensaje(`Error: ${data.error || "No se pudo registrar el voto"}`);
         }
@@ -73,21 +92,41 @@ function EmisionVoto() {
     localStorage.removeItem("tokenId");
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("observado");
     navigate("/login");
   };
 
   const volverTareasMesa = () => {
-    navigate("/miembroMesa");
+    navigate("/mesa");
   };
 
-  const listasFiltradas = listas.filter((lista) => {
-    const texto = busqueda.trim().toLowerCase();
-    return (
-      texto === "" ||
-      lista.NumeroLista.toString().includes(texto) ||
-      lista.IdPartido.toString().includes(texto)
-    );
-  });
+  const listasFiltradas = listas
+    .filter((lista) => {
+      const texto = busqueda.trim().toLowerCase();
+      return (
+        texto === "" ||
+        lista.NumeroLista.toString().includes(texto) ||
+        (lista.NombrePartido &&
+          lista.NombrePartido.toLowerCase().includes(texto))
+      );
+    })
+    .sort((a, b) => a.NumeroLista - b.NumeroLista);
+
+  const obtenerClaseColor = (nombrePartido) => {
+    const nombre = nombrePartido.toLowerCase();
+    if (nombre.includes("asamblea popular")) return "color-ap";
+    if (nombre.includes("cabildo abierto")) return "color-ca";
+    if (nombre.includes("frente amplio")) return "color-fa";
+    if (nombre.includes("avanzar republicano")) return "color-ar";
+    if (nombre.includes("colorado")) return "color-pc";
+    if (nombre.includes("ambientalista")) return "color-amb";
+    if (nombre.includes("ecologista")) return "color-eco";
+    if (nombre.includes("identidad soberana")) return "color-ids";
+    if (nombre.includes("independiente")) return "color-pi";
+    if (nombre.includes("nacional")) return "color-pn";
+    if (nombre.includes("pcn")) return "color-pcn";
+    return "color-generico";
+  };
 
   return (
     <div className="contenedor-voto">
@@ -99,7 +138,7 @@ function EmisionVoto() {
       </header>
 
       <main className="cuerpo">
-        {!votoExitoso && (
+        {!votoExitoso ? (
           <>
             <div className="seccion-busqueda">
               <h2 className="titulo-seleccion">Seleccioná una lista:</h2>
@@ -146,7 +185,9 @@ function EmisionVoto() {
               {listasFiltradas.map((lista, i) => (
                 <label
                   key={i}
-                  className={`opcion-lista color-partido-${lista.IdPartido} ${
+                  className={`opcion-lista ${obtenerClaseColor(
+                    lista.NombrePartido
+                  )} ${
                     seleccionada === lista.NumeroLista ? "seleccionada" : ""
                   }`}
                 >
@@ -159,29 +200,45 @@ function EmisionVoto() {
                   <div>
                     <strong>Lista {lista.NumeroLista}</strong>
                     <br />
-                    Partido {lista.IdPartido}
+                    Partido {lista.NombrePartido}
                   </div>
                 </label>
               ))}
             </div>
           </>
+        ) : (
+          <div className="mensaje-exito">
+            <h2>¡Voto registrado con éxito!</h2>
+            <p>{tipoVoto}</p>
+            {observado && (
+              <p className="observado">
+                Este voto fue registrado como observado.
+              </p>
+            )}
+            <p>Gracias por participar en la elección.</p>
+
+            <div className="acciones-post-voto">
+              {userRole === "miembro" ? (
+                <button className="boton-confirmar" onClick={volverTareasMesa}>
+                  Volver a mesa
+                </button>
+              ) : (
+                <button className="boton-confirmar" onClick={cerrarSesion}>
+                  Salir
+                </button>
+              )}
+            </div>
+          </div>
         )}
 
-        {mensaje && <p className="mensaje">{mensaje}</p>}
+        {mensaje && !votoExitoso && <p className="mensaje">{mensaje}</p>}
       </main>
 
       <footer className="pie">
-        {!votoExitoso ? (
+        {!votoExitoso && (
           <button className="boton-confirmar" onClick={confirmarVoto}>
             Confirmar
           </button>
-        ) : (
-          <div className="acciones-post-voto">
-            {userRole === "miembro" ? (
-              <button onClick={volverTareasMesa}>Volver a mesa</button>
-            ) : null}
-            <button onClick={cerrarSesion}>Cerrar sesión</button>
-          </div>
         )}
       </footer>
     </div>
