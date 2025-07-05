@@ -29,18 +29,17 @@ async function authenticate(ci, contrasena, circuito) {
 
     let role = null;
 
-    if (votante) {
+    if (miembro) {
+      if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
+      role = 'miembro';
+      debeElegir = !!votante;
+    } else if (votante) {
       if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
       role = 'votante';
       await conn.query(
         'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
         [ci, circuito]
       );
-    } else if (miembro) {
-      if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
-      role = 'miembro';
-    } else {
-      observado = true;
     }
 
     const sessionId = crypto.randomUUID();
@@ -55,7 +54,7 @@ async function authenticate(ci, contrasena, circuito) {
       [ci, expiresAt]
     );
 
-    return { sessionId, tokenId: tokenResult.insertId, role, observado };
+    return { sessionId, tokenId: tokenResult.insertId, role, observado, debeElegir };
   } finally {
     conn.release();
   }
