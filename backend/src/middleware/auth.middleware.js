@@ -2,6 +2,7 @@ const pool = require('../db');
 
 async function authMiddleware(req, res, next) {
   const tokenId = req.headers['token'] || req.headers['authorization'];
+  console.log('Header token', tokenId);
   if (!tokenId) {
     return res.status(401).json({ error: 'No session' });
   }

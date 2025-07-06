@@ -26,10 +26,7 @@ async function authenticate(ci, contrasena, circuito) {
 
     console.log("Circuito Info:", circuitoInfo);
     if (!circuitoInfo) throw new Error("Circuito no encontrado");
-    const observado =
-      person.CredencialCivica < circuitoInfo.PrimeraCredencial ||
-      person.CredencialCivica > circuitoInfo.UltimaCredencial;
-    console.log("Observado:", observado);
+    let observado = false;
     let debeElegir = false;
     let role = null;
     
@@ -45,10 +42,6 @@ async function authenticate(ci, contrasena, circuito) {
         observado = true;
       } else {
         role = 'votante';
-        await conn.query(
-          'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
-          [ci, circuito]
-        );
       }
     } else {
       throw new Error('El usuario no se encuentra registrado o ya ha votado');

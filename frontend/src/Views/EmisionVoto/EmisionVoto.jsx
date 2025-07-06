@@ -66,7 +66,8 @@ function EmisionVoto() {
         sessionId: localStorage.getItem("sessionId"),
         numeroLista: seleccionada,
         esObservado: observado,
-        numeroCircuito: localStorage.getItem("numeroCircuito")
+        numeroCircuito: localStorage.getItem("numeroCircuito"),
+        ci: localStorage.getItem("ci")
       }),
     })
       .then((res) => res.json())
@@ -96,6 +97,7 @@ function EmisionVoto() {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userRole");
     localStorage.removeItem("observado");
+    localStorage.removeItem("ci");
     navigate("/login");
   };
 

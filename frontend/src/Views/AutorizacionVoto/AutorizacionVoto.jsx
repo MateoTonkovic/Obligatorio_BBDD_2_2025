@@ -5,24 +5,54 @@ import escudo from "../../Images/escudoUruguay.png";
 export default function AutorizarVoto() {
 const [observados, setObservados] = useState([]);
 const [mensaje, setMensaje] = useState("");
-const [isLoading, setIsLoading] = useState(true); // Nuevo estado de carga
+const [mesaAbierta, setMesaAbierta] = useState(false);
 
 useEffect(() => {
+  const verificarEstadoMesa = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/api/estadoMesa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "authorization": localStorage.getItem("tokenId"),
+        },
+        body: JSON.stringify({ circuito: localStorage.getItem("numeroCircuito") }),
+      });
+
+      const data = await res.json();
+      if (data.estado === "Cerrada") {
+        setMesaAbierta(false);
+        setMensaje("La mesa se encuentra cerrada.");
+      }
+      else setMesaAbierta(true);
+    } catch (error) {
+      console.error("No se pudo verificar el estado de la mesa:", error);
+    }
+  };
+
+  verificarEstadoMesa();
+}, []);
+
+useEffect(() => {
+  if (!mesaAbierta) return;
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/votos/observados", {
+      const res = await fetch("http://localhost:3001/api/observados", {
+        method: "POST",
         headers: {
-          "Authorization": localStorage.getItem("tokenId"),
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+          "authorization": localStorage.getItem("tokenId")
+        },
+        body: JSON.stringify({ circuito: localStorage.getItem("numeroCircuito") }),
       });
-      
+
       const data = await res.json();
       setObservados(Array.isArray(data) ? data : []);
-      
+
       if (!data || data.length === 0) {
-        setMensaje("No hay votos observados pendientes");
+        setMensaje("No hay votos observados pendientes.");
       }
       console.log(data);
     } catch (error) {
@@ -33,14 +63,32 @@ useEffect(() => {
     }
   };
   fetchData();
-}, []);
+}, [mesaAbierta]);
 
-  const autorizarVoto = (idVoto) => {
-    fetch("http://localhost:3001/api/votos/autorizar", {
+
+  const cerrarMesa = () => {
+    fetch("http://localhost:3001/api/cerrarMesa", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `${localStorage.getItem("tokenId")}`,
+        "authorization": localStorage.getItem("tokenId")
+      },
+      body: JSON.stringify({ circuito: localStorage.getItem("numeroCircuito") }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        setObservados([]);
+        setMensaje("✅ Mesa cerrada correctamente.");
+      })
+      .catch(() => setMensaje("❌ No se pudo cerrar la mesa."));
+  }
+
+  const autorizarVoto = (idVoto) => {
+    fetch("http://localhost:3001/api/autorizar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "authorization": localStorage.getItem("tokenId")
       },
       body: JSON.stringify({ idVoto }),
     })
@@ -52,15 +100,6 @@ useEffect(() => {
       .catch(() => setMensaje("❌ No se pudo autorizar el voto."));
   };
 
-  if (isLoading) {
-    return (
-      <div className="spinner-container">
-        <div className="spinner"></div>
-        <p>Cargando...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="contenedor-autorizacion">
       <header className="encabezado">
@@ -71,6 +110,16 @@ useEffect(() => {
       </header>
 
       <main className="cuerpo">
+        {mesaAbierta && (
+        <div className="boton-cierre-container">
+          <button
+            className="boton-cierreMesa"
+            onClick={() => cerrarMesa()}
+          >
+            Cerrar Mesa
+          </button>
+        </div>
+        )}
         {observados.length === 0 ? (
           <p className="mensaje">{mensaje}</p>
         ) : (
@@ -79,7 +128,6 @@ useEffect(() => {
               <div key={voto.IdVoto} className="fila-voto">
                 <div>
                   <strong>Voto ID:</strong> {voto.IdVoto} <br />
-                  <strong>CI Votante:</strong> {voto.CIPersona} <br />
                   <strong>Circuito:</strong> {voto.NumeroCircuito}
                 </div>
                 <button

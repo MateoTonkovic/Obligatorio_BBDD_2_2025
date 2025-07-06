@@ -23,6 +23,7 @@ export default function LoginScreen() {
         localStorage.setItem('userRole', role);
         localStorage.setItem('observado', observado);
         localStorage.setItem('numeroCircuito', circuito);
+        localStorage.setItem('ci', ci);
 
         if (role === 'miembro' && debeElegir) {
             navigate('/mesa/decidir');

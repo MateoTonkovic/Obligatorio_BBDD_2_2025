@@ -2,7 +2,8 @@ exports.emitirVoto = async (
   sessionId,
   numeroLista,
   esObservado,
-  numeroCircuito
+  numeroCircuito,
+  ci
 ) => {
   const conn = await pool.getConnection();
   try {
@@ -50,6 +51,11 @@ exports.emitirVoto = async (
     await conn.query(
       "UPDATE Session SET Utilizado = TRUE WHERE SessionId = ?",
       [sessionId]
+    );
+
+    await conn.query(
+      'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
+      [ci, numeroCircuito]
     );
 
     await conn.query(

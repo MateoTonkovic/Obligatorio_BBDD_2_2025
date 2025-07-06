@@ -33,37 +33,67 @@
 .cuerpo {
   background-color: #eceaea;
   flex-grow: 1;
-  padding: 2rem;
+  padding: 0.5rem 2rem 2rem 2rem;
   text-align: center;
+  overflow-y: auto;
 }
 
 .tabla-observados {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
-  max-width: 600px;
   margin: 0 auto;
+  max-width: 1200px;
+
+  max-height: calc(3 * 180px + 2rem); /* Altura estimada de 3 tarjetas + padding */
+  overflow-y: auto;
+  padding-right: 0.5rem; /* Para que no tape el scroll */
 }
 
 .fila-voto {
   background: #fff;
   border-radius: 16px;
   padding: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 150px;
 }
 
-.boton-confirmar {
-  background-color: #25418e;
+
+.fila-voto > div {
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.boton-cierreMesa {
+  background-color: #d30a1b;
   color: white;
-  padding: 0.6rem 1.5rem;
+  padding: 0.9rem 2rem;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.boton-cierre-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.boton-cierreMesa:hover {
+  background-color: #020b1f;
+}
+
+.boton-confirmar {
+  align-self: flex-end;
+  margin-top: auto;
 }
 
 .boton-confirmar:hover {
