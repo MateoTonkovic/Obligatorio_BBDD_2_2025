@@ -19,13 +19,22 @@ router.post("/", async (req, res) => {
       [sessionId, numeroLista, idEleccion, numeroCircuito, tipo, esObservado]
     );
 
-    // ✅ marcar que el votante ya votó (esto es opcional y depende del flujo)
-    // await db.query("UPDATE Votante SET Voto = true WHERE SessionId = $1", [sessionId]);
-
     res.status(201).json({ exito: true, idVoto: resultado.rows[0].idvoto });
   } catch (error) {
     console.error("Error registrando voto:", error);
     res.status(500).json({ exito: false, error: error.message });
+  }
+});
+
+router.get("/observados", async (req, res) => {
+  try {
+    const resultado = await db.query(
+      `SELECT * FROM Voto WHERE EsObservado = TRUE AND Autorizado = FALSE`
+    );
+    res.status(200).json(resultado.rows || []);
+  } catch (error) {
+    console.error("Error obteniendo votos observados:", error);
+    res.status(500).json([]);
   }
 });
 

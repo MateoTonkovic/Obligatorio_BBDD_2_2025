@@ -1,9 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const seederRouter = require('./seeder');
-const listasRouter = require("./routes/listas");
-const votosRouter = require("./routes/votos");
+const express = require("express");
+const cors = require("cors");
+const seederRouter = require("./seeder");
+const listasRouter = require("./routes/listas.routes");
+const votosRouter = require("./routes/votos.routes");
 const authRouter = require("./routes/auth.routes");
+const authVoto = require("./routes/authVoto");
 const authMiddleware = require("./middleware/auth.middleware");
 
 const app = express();
@@ -19,12 +20,8 @@ app.use('/api', authMiddleware);
 
 app.use('/api/listas', listasRouter);
 app.use('/api/votos', votosRouter);
-
-app.get('/', (req, res) => {
-    res.send({ message: 'mensaje de backend' });
-});
-
+app.use('/api/votos/autorizar', authVoto);
 
 app.listen(PORT, () => {
-    console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
 });

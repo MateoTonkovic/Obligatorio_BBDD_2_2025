@@ -22,11 +22,12 @@ export default function LoginScreen() {
         localStorage.setItem('tokenId', tokenId);
         localStorage.setItem('userRole', role);
         localStorage.setItem('observado', observado);
+        localStorage.setItem('numeroCircuito', circuito);
 
         if (role === 'miembro' && debeElegir) {
             navigate('/mesa/decidir');
         } else if (role === 'miembro') {
-            navigate('/mesa');
+            navigate('/mesa/autorizar');
         } else {
             navigate('/votar');
         }

@@ -19,6 +19,7 @@ function parseCSV(fileName) {
 
 router.post('/seed', async (req, res) => {
   const conn = await pool.getConnection();
+
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS=0');
 
