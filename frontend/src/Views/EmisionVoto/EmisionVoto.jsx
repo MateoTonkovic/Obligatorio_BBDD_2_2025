@@ -13,12 +13,13 @@ function EmisionVoto() {
   const [tipoVoto, setTipoVoto] = useState("");
   const [observado, setObservado] = useState(false);
   const navigate = useNavigate();
+  const debeElegir = localStorage.getItem("debeElegir") === "true";
 
   useEffect(() => {
     const token = localStorage.getItem("tokenId");
     const role = localStorage.getItem("userRole");
     const esObservado = localStorage.getItem("observado") === "true";
-
+    
 
     setUserRole(role);
     setObservado(esObservado);
@@ -96,6 +97,7 @@ function EmisionVoto() {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userRole");
     localStorage.removeItem("observado");
+    localStorage.removeItem("numeroCircuito");
     navigate("/login");
   };
 
@@ -221,7 +223,7 @@ function EmisionVoto() {
             <p>Gracias por participar en la elección.</p>
 
             <div className="acciones-post-voto">
-              {userRole === "miembro" ? (
+              {userRole === "miembro" || debeElegir ? (
                 <button className="boton-confirmar" onClick={volverTareasMesa}>
                   Volver a mesa
                 </button>
