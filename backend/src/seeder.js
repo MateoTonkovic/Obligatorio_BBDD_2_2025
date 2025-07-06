@@ -54,6 +54,7 @@ router.post('/seed', async (req, res) => {
 
     await conn.beginTransaction();
 
+    console.log('Creando departamentos')
     const deptNames = Array.from(new Set([
       ...circuital.map(r => r.Departamento),
       ...integration.map(r => r.Departamento)
@@ -65,12 +66,14 @@ router.post('/seed', async (req, res) => {
     );
     const deptMap = new Map(deptNames.map((n, i) => [n, i + 1]));
 
+    console.log('Creando localidades')
     const locKeys = Array.from(new Set(
       circuital.map(r => `${r.Localidad}|${deptMap.get(r.Departamento)}`)
     ));
     const locValues = locKeys.map((key, idx) => {
-      const [loc,] = key.split('|');
-      const deptId = deptMap.get(circuital.find(r => `${r.Localidad}|${deptMap.get(r.Departamento)}` === key).Departamento);
+      const [loc] = key.split('|');
+      const rec = circuital.find(r => `${r.Localidad}|${deptMap.get(r.Departamento)}` === key);
+      const deptId = deptMap.get(rec.Departamento);
       return [idx + 1, loc, 'Desconocida', deptId];
     });
     await conn.query(
@@ -79,6 +82,7 @@ router.post('/seed', async (req, res) => {
     );
     const locMap = new Map(locKeys.map((k, i) => [k, i + 1]));
 
+    console.log('Creando zonas')
     const zoneValues = Array.from(locMap.values()).map((locId, idx) => [idx + 1, `Zona ${locId}`, locId]);
     await conn.query(
       'INSERT IGNORE INTO Zona (IdZona, Nombre, IdLocalidad) VALUES ?',
@@ -86,6 +90,7 @@ router.post('/seed', async (req, res) => {
     );
     const zoneMap = new Map(zoneValues.map(([, , locId], i) => [locId, i + 1]));
 
+    console.log('Creando establecimientos')
     const estKeys = Array.from(new Set(circuital.map(r => r.Local)));
     const estValues = estKeys.map((name, idx) => {
       const rec = circuital.find(r => r.Local === name);
@@ -100,6 +105,7 @@ router.post('/seed', async (req, res) => {
     );
     const estMap = new Map(estKeys.map((n, i) => [n, i + 1]));
 
+    console.log('Creando comisarías')
     const comisValues = deptNames.map((name, idx) => {
       const num = (idx + 1) * 10;
       return [num, `Comisaria de ${name}`, idx + 1];
@@ -110,6 +116,7 @@ router.post('/seed', async (req, res) => {
     );
     const comisMap = new Map(deptNames.map((n, i) => [i + 1, (i + 1) * 10]));
 
+    console.log('Creando circuitos')
     const circuitoValues = circuital.map(r => [
       r.NroCircuito,
       estMap.get(r.Local),
@@ -122,12 +129,15 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Circuito (NumeroCircuito, IdEstablecimiento, EsAccesible, NumeroDeVotos, PrimeraCredencial, UltimaCredencial) VALUES ?',
       [circuitoValues]
     );
+    
+    console.log('Creando mesas')
     const mesaValues = circuital.map(r => [r.NroCircuito, r.NroCircuito, 'ABIERTA']);
     await conn.query(
       'INSERT IGNORE INTO Mesa (IdMesa, NumeroCircuito, Estado) VALUES ?',
       [mesaValues]
     );
 
+    console.log('Creando partidos políticos')
     const partyNames = Array.from(new Set(integration.map(r => r.PartidoPolitico)));
     const partyValues = partyNames.map((p, idx) => [idx + 1, p, `${p} 123 Calle Falsa`]);
     await conn.query(
@@ -136,6 +146,7 @@ router.post('/seed', async (req, res) => {
     );
     const partyMap = new Map(partyNames.map((p, i) => [p, i + 1]));
 
+    console.log('Creando listas')
     const listKeys = Array.from(new Set(
       integration.map(r => `${r.PartidoPolitico}|${r.Departamento}`)
     ));
@@ -149,11 +160,13 @@ router.post('/seed', async (req, res) => {
     );
     const listMap = new Map(listKeys.map((k, i) => [k, i + 1]));
 
+    console.log('Creando elecciones')
     await conn.query(
       'INSERT IGNORE INTO Eleccion (IdEleccion, Tipo, Fecha) VALUES (?, ?, ?)',
       [1, 'Nacional', new Date()]
     );
 
+    console.log('Creando personas')
     const personaValues = integration.map(r => [
       r.CredencialNumero,
       r.CredencialNumero,
@@ -166,6 +179,7 @@ router.post('/seed', async (req, res) => {
       [personaValues]
     );
 
+    console.log('Creando candidatos')
     const candidatoValues = integration.map(r => [
       r.CredencialNumero,
       1,
@@ -176,6 +190,7 @@ router.post('/seed', async (req, res) => {
       [candidatoValues]
     );
 
+    console.log('Creando integra')
     const integraValues = integration.map(r => {
       const org = r.Candidatura.includes('Diputado')
         ? 'Diputado'
@@ -194,11 +209,35 @@ router.post('/seed', async (req, res) => {
       [integraValues]
     );
 
-    const votanteValues = circuital.map(r => [
+    console.log('Creando votantes')
+    const personaVotanteValues = circuital.map(r => [
       r.Desde,
-      r.NroCircuito,
-      'pass',
-      false
+      r.Desde,
+      'Votante',
+      'Seed',
+      '1980-01-01'
+    ]);
+    await conn.query(
+      'INSERT IGNORE INTO Persona (CI, CredencialCivica, Nombre, Apellido, FechaNacimiento) VALUES ?',
+      [personaVotanteValues]
+    );
+
+    console.log('Creando miembros de mesa')
+    const personaMiembroValues = circuital.map(r => [
+      r.Desde + 100000,
+      r.Desde + 100000,
+      'Miembro',
+      'Mesa',
+      '1985-01-01'
+    ]);
+    await conn.query(
+      'INSERT IGNORE INTO Persona (CI, CredencialCivica, Nombre, Apellido, FechaNacimiento) VALUES ?',
+      [personaMiembroValues]
+    );
+
+    const votanteValues = circuital.flatMap(r => [
+      [r.Desde, r.NroCircuito, 'pass', false],        
+      [r.Desde + 100000, r.NroCircuito, 'pass', false] 
     ]);
     await conn.query(
       'INSERT IGNORE INTO Votante (CIPersona, NumeroCircuito, Contrasena, Voto) VALUES ?',
@@ -217,6 +256,7 @@ router.post('/seed', async (req, res) => {
       [miembroValues]
     );
 
+    console.log('Creando agentes policiales')
     const agentePersonaValues = circuital.map(r => [
       r.Desde + 200000,
       r.Desde + 200000,
@@ -228,7 +268,6 @@ router.post('/seed', async (req, res) => {
       'INSERT IGNORE INTO Persona (CI, CredencialCivica, Nombre, Apellido, FechaNacimiento) VALUES ?',
       [agentePersonaValues]
     );
-
     const agenteValues = circuital.map(r => [
       r.Desde + 200000,
       comisMap.get(deptMap.get(r.Departamento)),
@@ -241,8 +280,7 @@ router.post('/seed', async (req, res) => {
 
     await conn.commit();
     await conn.query('SET FOREIGN_KEY_CHECKS=1');
-
-    res.json({ status: 'OK', message: 'Bulk-seed completed' });
+    res.json({ status: 'OK', message: 'Seeds completado' });
   } catch (err) {
     console.error(err);
     await conn.rollback();
