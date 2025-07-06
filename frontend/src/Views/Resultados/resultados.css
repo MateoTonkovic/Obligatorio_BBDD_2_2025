@@ -239,7 +239,7 @@ h2 {
   z-index: 999;
 }
 
-.boton-confirmar {
+.boton-salir {
   background-color: #25418e;
   color: white;
   padding: 0.9rem 2rem;
@@ -251,6 +251,6 @@ h2 {
   transition: background-color 0.3s;
 }
 
-.boton-confirmar:hover {
+.boton-salir:hover {
   background-color: #020b1f;
 }

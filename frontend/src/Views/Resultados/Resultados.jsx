@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./resultados.css";
 import escudo from "../../Images/escudoUruguay.png";
 
@@ -12,6 +13,7 @@ export default function Resultados() {
   const [departamentoSeleccionado, setDepartamentoSeleccionado] = useState("");
   const [datos, setDatos] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
@@ -34,7 +36,7 @@ export default function Resultados() {
       .then((data) => setDepartamentos(data))
       .catch((err) => console.error("Error al cargar departamentos:", err));
   }, []);
-  console.log(departamentoSeleccionado)
+  console.log(departamentoSeleccionado);
 
   useEffect(() => {
     setDatos([]);
@@ -70,7 +72,7 @@ export default function Resultados() {
     departamentoSeleccionado,
   ]);
 
-   const cerrarSesion = () => {
+  const cerrarSesion = () => {
     localStorage.removeItem("tokenId");
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userRole");
@@ -78,7 +80,6 @@ export default function Resultados() {
     localStorage.removeItem("numeroCircuito");
     navigate("/login");
   };
-
 
   return (
     <div className="contenedor">
@@ -298,7 +299,9 @@ export default function Resultados() {
         ) : null}
       </div>
       <footer className="pie">
-        <button className="boton-salir" onClick={cerrarSesion}>Salir</button>
+        <button className="boton-salir" onClick={cerrarSesion}>
+          Salir
+        </button>
       </footer>
     </div>
   );

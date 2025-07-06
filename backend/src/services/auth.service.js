@@ -45,12 +45,6 @@ async function authenticate(ci, contrasena, circuito) {
         'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
         [ci, circuito]
       );
-
-      role = 'votante';
-      await conn.query(
-        'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
-        [ci, circuito]
-      );
     } else {
       throw new Error("El usuario no se encuentra registrado o ya ha votado");
     }
