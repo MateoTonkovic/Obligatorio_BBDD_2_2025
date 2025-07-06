@@ -61,7 +61,7 @@ export default function LoginScreen() {
                 </div>
             </header>
 
-            <main className="cuerpo">
+            <main className="cuerpo-login">
                 <div className="login-form">
                     <label className='label'>
                         CI

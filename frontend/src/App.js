@@ -4,6 +4,7 @@ import EmisionVoto from './Views/EmisionVoto/EmisionVoto';
 import PantallaDecision from './Views/PantallaDecision/PantallaDecision';
 import PrivateRoute from './middlewares/PrivateRoute';
 import AutorizarVoto from './Views/AutorizacionVoto/AutorizacionVoto';
+import Resultados from './Views/Resultados/Resultados';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/mesa">
               <Route path="decidir" element={<PantallaDecision />} />
               <Route path="autorizar" element={<AutorizarVoto />} />
+              <Route path="/resultados" element={<Resultados />} />
               <Route index element={<AutorizarVoto />} />
             </Route>
           </Route>

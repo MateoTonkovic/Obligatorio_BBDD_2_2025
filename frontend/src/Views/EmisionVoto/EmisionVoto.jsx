@@ -96,6 +96,7 @@ function EmisionVoto() {
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userRole");
     localStorage.removeItem("observado");
+    localStorage.removeItem("numeroCircuito");
     navigate("/login");
   };
 

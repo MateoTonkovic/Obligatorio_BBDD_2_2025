@@ -7,10 +7,11 @@ async function authenticate(ci, contrasena, circuito) {
     const [[person]] = await conn.query("SELECT * FROM Persona WHERE CI = ?", [
       ci,
     ]);
+    console.log("Persona encontrada:", person);
     if (!person) throw new Error("Usuario no encontrado");
 
     const [[votante]] = await conn.query(
-      'SELECT NumeroCircuito, Contrasena FROM Votante WHERE CIPersona = ? AND Voto = FALSE',
+      "SELECT NumeroCircuito, Contrasena FROM Votante WHERE CIPersona = ? AND Voto = FALSE",
       [ci]
     );
 
@@ -32,26 +33,22 @@ async function authenticate(ci, contrasena, circuito) {
     console.log("Observado:", observado);
     let debeElegir = false;
     let role = null;
-    
+
     if (miembro) {
-      if (miembro.Contrasena !== contrasena) throw new Error('Credencial inválida');
-      role = 'miembro';
+      if (miembro.Contrasena !== contrasena)
+        throw new Error("Credencial inválida");
+      role = "miembro";
       debeElegir = !!votante; // Si aparte de ser miembro, es votante, debe elegir posteriormente
     } else if (votante) {
-      if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
+      if (votante.Contrasena !== contrasena) throw new Error("Credencial inválida");
 
-      if (votante.NumeroCircuito !== parseInt(circuito)) {
-        // Si no coincide el circuito, el voto es observado
-        observado = true;
-      } else {
-        role = 'votante';
-        await conn.query(
-          'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
-          [ci, circuito]
-        );
-      }
+      role = "votante";
+      await conn.query(
+        "UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?",
+        [ci, circuito]
+      );
     } else {
-      throw new Error('El usuario no se encuentra registrado o ya ha votado');
+      throw new Error("El usuario no se encuentra registrado o ya ha votado");
     }
 
     const sessionId = crypto.randomUUID();

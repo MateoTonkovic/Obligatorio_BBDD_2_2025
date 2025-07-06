@@ -37,7 +37,7 @@ html,
     font-weight: bold;
 }
 
-.cuerpo {
+.cuerpo-login {
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -81,7 +81,7 @@ html,
 }
 
 .boton-confirmar {
-    background-color: red;
+    background-color:#25418e;
     color: #ffffff;
     padding: 0.9rem 2rem;
     border: none;
