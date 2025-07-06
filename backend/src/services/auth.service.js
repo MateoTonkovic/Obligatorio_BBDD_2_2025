@@ -7,7 +7,6 @@ async function authenticate(ci, contrasena, circuito) {
     const [[person]] = await conn.query("SELECT * FROM Persona WHERE CI = ?", [
       ci,
     ]);
-    console.log("Persona encontrada:", person);
     if (!person) throw new Error("Usuario no encontrado");
 
     const [[votante]] = await conn.query(
@@ -40,11 +39,16 @@ async function authenticate(ci, contrasena, circuito) {
       role = "miembro";
       debeElegir = !!votante; // Si aparte de ser miembro, es votante, debe elegir posteriormente
     } else if (votante) {
-      if (votante.Contrasena !== contrasena) throw new Error("Credencial inválida");
-
-      role = "votante";
+      if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
+      role = 'votante';
       await conn.query(
-        "UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?",
+        'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
+        [ci, circuito]
+      );
+
+      role = 'votante';
+      await conn.query(
+        'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
         [ci, circuito]
       );
     } else {

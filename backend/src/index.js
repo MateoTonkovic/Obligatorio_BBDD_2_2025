@@ -24,7 +24,6 @@ app.use('/api/listas', listasRouter);
 app.use('/api/votos', votosRouter);
 app.use('/api/votos/autorizar', authVoto);
 
-
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
 });
