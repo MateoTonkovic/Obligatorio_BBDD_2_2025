@@ -80,7 +80,7 @@ html,
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
-.boton-confirmar {
+.boton-confirmar-login {
     background-color:#25418e;
     color: #ffffff;
     padding: 0.9rem 2rem;
@@ -92,7 +92,7 @@ html,
     transition: background-color 0.3s;
 }
 
-.boton-confirmar:hover {
+.boton-confirmar-login:hover {
     background-color: #020b1f;
 }
 

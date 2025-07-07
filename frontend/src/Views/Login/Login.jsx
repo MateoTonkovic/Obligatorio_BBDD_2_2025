@@ -91,7 +91,7 @@ export default function LoginScreen() {
                             placeholder="Número de circuito"
                         />
                     </label>
-                    <button className="boton-confirmar" onClick={handleSubmit}>
+                    <button className="boton-confirmar-login" onClick={handleSubmit}>
                         Iniciar Sesión
                     </button>
                     {mensaje && <p className="mensaje">{mensaje}</p>}
