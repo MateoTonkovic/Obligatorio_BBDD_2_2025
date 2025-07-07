@@ -26,16 +26,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/observados", async (req, res) => {
-  try {
-    const resultado = await db.query(
-      `SELECT * FROM Voto WHERE EsObservado = TRUE AND Autorizado = FALSE`
-    );
-    res.status(200).json(resultado.rows || []);
-  } catch (error) {
-    console.error("Error obteniendo votos observados:", error);
-    res.status(500).json([]);
-  }
-});
-
 module.exports = router;

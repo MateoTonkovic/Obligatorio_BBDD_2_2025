@@ -22,6 +22,8 @@ export default function LoginScreen() {
         localStorage.setItem('tokenId', tokenId);
         localStorage.setItem('userRole', role);
         localStorage.setItem('observado', observado);
+        localStorage.setItem('numeroCircuito', circuito);
+        localStorage.setItem('debeElegir', debeElegir);
 
         if (role === 'miembro' && debeElegir) {
             navigate('/mesa/decidir');
@@ -60,7 +62,7 @@ export default function LoginScreen() {
                 </div>
             </header>
 
-            <main className="cuerpo">
+            <main className="cuerpo-login">
                 <div className="login-form">
                     <label className='label'>
                         CI

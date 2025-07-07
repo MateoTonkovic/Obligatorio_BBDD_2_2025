@@ -3,9 +3,9 @@ const router = express.Router();
 const db = require("../db");
 
 router.post("/", async (req, res) => {
-    const { idVoto } = req.body;
+    const circuito = parseInt(req.body.circuito, 10);
     try {
-        await db.query("UPDATE Voto SET Autorizado = TRUE WHERE IdVoto = ?", [idVoto]);
+        await db.query("UPDATE Mesa SET Estado = 'CERRADA' WHERE IdMesa = ?", [circuito]);
         res.sendStatus(200);
     } catch (error) {
         console.error("Error autorizando voto:", error);
