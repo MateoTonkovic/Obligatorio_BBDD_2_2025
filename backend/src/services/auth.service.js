@@ -26,13 +26,10 @@ async function authenticate(ci, contrasena, circuito) {
 
     console.log("Circuito Info:", circuitoInfo);
     if (!circuitoInfo) throw new Error("Circuito no encontrado");
-    const observado =
-      person.CredencialCivica < circuitoInfo.PrimeraCredencial ||
-      person.CredencialCivica > circuitoInfo.UltimaCredencial;
-    console.log("Observado:", observado);
+    let observado = false;
     let debeElegir = false;
     let role = null;
-
+    
     if (miembro) {
       if (miembro.Contrasena !== contrasena)
         throw new Error("Credencial inválida");
@@ -40,13 +37,19 @@ async function authenticate(ci, contrasena, circuito) {
       debeElegir = !!votante; // Si aparte de ser miembro, es votante, debe elegir posteriormente
     } else if (votante) {
       if (votante.Contrasena !== contrasena) throw new Error('Credencial inválida');
-      role = 'votante';
-      await conn.query(
-        'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
-        [ci, circuito]
-      );
+
+      if (votante.NumeroCircuito !== parseInt(circuito)) {
+        // Si no coincide el circuito, el voto es observado
+        observado = true;
+      } else {
+        role = 'votante';
+        await conn.query(
+          'UPDATE Votante SET Voto = TRUE WHERE CIPersona = ? AND NumeroCircuito = ?',
+          [ci, circuito]
+        );
+      }
     } else {
-      throw new Error("El usuario no se encuentra registrado o ya ha votado");
+      throw new Error('El usuario no se encuentra registrado o ya ha votado');
     }
 
     const sessionId = crypto.randomUUID();
