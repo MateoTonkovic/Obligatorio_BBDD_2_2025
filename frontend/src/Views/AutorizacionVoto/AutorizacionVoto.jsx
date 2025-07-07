@@ -1,72 +1,73 @@
 import { useState, useEffect } from "react";
 import "./autorizacionVoto.css";
 import escudo from "../../Images/escudoUruguay.png";
+import { useNavigate } from "react-router-dom";
 
 export default function AutorizarVoto() {
-const [observados, setObservados] = useState([]);
-const [mensaje, setMensaje] = useState("");
-const [mesaAbierta, setMesaAbierta] = useState(false);
+  const [observados, setObservados] = useState([]);
+  const [mensaje, setMensaje] = useState("");
+  const [mesaAbierta, setMesaAbierta] = useState(false);
+  const navigate = useNavigate();
 
-useEffect(() => {
-  const verificarEstadoMesa = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/estadoMesa", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": localStorage.getItem("tokenId"),
-        },
-        body: JSON.stringify({
-          circuito: localStorage.getItem("numeroCircuito"),
-        }),
-      });
+  useEffect(() => {
+    const verificarEstadoMesa = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/estadoMesa", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": localStorage.getItem("tokenId"),
+          },
+          body: JSON.stringify({
+            circuito: localStorage.getItem("numeroCircuito"),
+          }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.estado.toUpperCase() === "CERRADA") {
-        setMesaAbierta(false);
-        setMensaje("La mesa se encuentra cerrada.");
-      } else {
-        setMesaAbierta(true);
+        if (data.estado.toUpperCase() === "CERRADA") {
+          setMesaAbierta(false);
+          setMensaje("La mesa se encuentra cerrada.");
+        } else {
+          setMesaAbierta(true);
+        }
+      } catch (error) {
+        console.error("❌ No se pudo verificar el estado de la mesa:", error);
+        setMensaje("Error al verificar el estado de la mesa.");
       }
-    } catch (error) {
-      console.error("❌ No se pudo verificar el estado de la mesa:", error);
-      setMensaje("Error al verificar el estado de la mesa.");
-    }
-  };
-
-  verificarEstadoMesa();
-}, []);
+    };
+    verificarEstadoMesa();
+  }, []);
 
 
-useEffect(() => {
-  if (!mesaAbierta) return;
+  useEffect(() => {
+    if (!mesaAbierta) return;
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/observados", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": localStorage.getItem("tokenId")
-        },
-        body: JSON.stringify({ circuito: localStorage.getItem("numeroCircuito") }),
-      });
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/observados", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": localStorage.getItem("tokenId")
+          },
+          body: JSON.stringify({ circuito: localStorage.getItem("numeroCircuito") }),
+        });
 
-      const data = await res.json();
-      setObservados(Array.isArray(data) ? data : []);
+        const data = await res.json();
+        setObservados(Array.isArray(data) ? data : []);
 
-      if (!data || data.length === 0) {
-        setMensaje("No hay votos observados pendientes.");
+        if (!data || data.length === 0) {
+          setMensaje("No hay votos observados pendientes.");
+        }
+        console.log(data);
+      } catch (error) {
+        setMensaje("Error al cargar votos");
+        setObservados([]);
       }
-      console.log(data);
-    } catch (error) {
-      setMensaje("Error al cargar votos");
-      setObservados([]);
-    }
-  };
-  fetchData();
-}, [mesaAbierta]);
+    };
+    fetchData();
+  }, [mesaAbierta]);
 
 
   const cerrarMesa = () => {
@@ -83,6 +84,7 @@ useEffect(() => {
         setObservados([]);
         setMensaje("✅ Mesa cerrada correctamente.");
         setMesaAbierta(false);
+        navigate("/resultados");
       })
       .catch(() => setMensaje("❌ No se pudo cerrar la mesa."));
   }
@@ -113,17 +115,25 @@ useEffect(() => {
         </div>
       </header>
 
-      <main className="cuerpo">
-        {mesaAbierta ? (
+      <main className="cuerpo-auth-voto">
         <div className="boton-cierre-container">
+          {mesaAbierta ? (
+            <button
+              className="boton-cierreMesa"
+              onClick={() => cerrarMesa()}
+            >
+              Cerrar Mesa
+            </button>
+          ) :
+          
           <button
             className="boton-cierreMesa"
-            onClick={() => cerrarMesa()}
+            onClick={() => navigate("/resultados")}
           >
-            Cerrar Mesa
+            Ver Resultados
           </button>
+          }
         </div>
-        ) : null}
         {observados.length === 0 ? (
           <p className="mensaje">{mensaje}</p>
         ) : (

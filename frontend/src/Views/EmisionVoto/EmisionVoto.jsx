@@ -19,7 +19,7 @@ function EmisionVoto() {
     const token = localStorage.getItem("tokenId");
     const role = localStorage.getItem("userRole");
     const esObservado = localStorage.getItem("observado") === "true";
-    
+
 
     setUserRole(role);
     setObservado(esObservado);
@@ -83,7 +83,9 @@ function EmisionVoto() {
             setTipoVoto(`Lista ${seleccionada}`);
           }
         } else {
+          setVotoExitoso(false);
           setMensaje(`Error: ${data.error || "No se pudo registrar el voto"}`);
+          window.scrollTo({ top: 100000 });
         }
       })
       .catch((err) => {
@@ -142,7 +144,7 @@ function EmisionVoto() {
         </div>
       </header>
 
-      <main className="cuerpo">
+      <main className="cuerpo-emision">
         {!votoExitoso ? (
           <>
             <div className="seccion-busqueda">
@@ -158,9 +160,8 @@ function EmisionVoto() {
 
             <div className="opciones-listas-grid">
               <label
-                className={`opcion-lista especial blanco ${
-                  seleccionada === "blanco" ? "seleccionada" : ""
-                }`}
+                className={`opcion-lista especial blanco ${seleccionada === "blanco" ? "seleccionada" : ""
+                  }`}
               >
                 <input
                   type="radio"
@@ -173,9 +174,8 @@ function EmisionVoto() {
                 </div>
               </label>
               <label
-                className={`opcion-lista especial anulado ${
-                  seleccionada === "anulado" ? "seleccionada" : ""
-                }`}
+                className={`opcion-lista especial anulado ${seleccionada === "anulado" ? "seleccionada" : ""
+                  }`}
               >
                 <input
                   type="radio"
@@ -192,9 +192,8 @@ function EmisionVoto() {
                   key={i}
                   className={`opcion-lista ${obtenerClaseColor(
                     lista.NombrePartido
-                  )} ${
-                    seleccionada === lista.NumeroLista ? "seleccionada" : ""
-                  }`}
+                  )} ${seleccionada === lista.NumeroLista ? "seleccionada" : ""
+                    }`}
                 >
                   <input
                     type="radio"
